@@ -1,0 +1,226 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #4F46E5; /* Indigo */
+  --primary-dark: #3730A3;
+  --secondary: #10B981; /* Emerald */
+  --accent: #F59E0B; /* Amber */
+  --background: #F8FAFC; /* Slate-50 */
+  --card-bg: #FFFFFF;
+  --text-primary: #1E293B; /* Slate-800 */
+  --text-secondary: #64748B; /* Slate-500 */
+  --border: #E2E8F0; /* Slate-200 */
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--background);
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+/* Container Styles */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Sidebar Styles */
+aside {
+  background: var(--card-bg);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
+
+aside h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+}
+
+aside nav button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+aside nav button:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateX(4px);
+}
+
+aside .grid button {
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+aside .grid button:hover {
+  background: var(--primary);
+  color: white;
+  transform: scale(1.05);
+}
+
+/* Main Content */
+main {
+  padding: 2rem;
+}
+
+main h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+  margin-bottom: 2rem;
+}
+
+/* Card Styles */
+.bg-white {
+  background: var(--card-bg);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  transition: box-shadow 0.3s ease;
+}
+
+.bg-white:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Input Styles */
+input, select {
+  background: #F9FAFB; /* Gray-50 */
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  width: 100%;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+
+/* Button Styles */
+button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+button.bg-indigo-600 {
+  background: var(--primary);
+  color: white;
+}
+
+button.bg-indigo-600:hover {
+  background: var(--primary-dark);
+  transform: scale(1.05);
+}
+
+button.bg-blue-500 {
+  background: var(--secondary);
+  color: white;
+}
+
+button.bg-blue-500:hover {
+  background: #059669;
+  transform: scale(1.05);
+}
+
+/* Dashboard Cards */
+.bg-blue-50, .bg-red-50, .bg-green-50, .bg-purple-50, .bg-yellow-50, .bg-teal-50, .bg-indigo-50 {
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease;
+}
+
+.bg-blue-50:hover { transform: scale(1.02); }
+.bg-red-50:hover { transform: scale(1.02); }
+.bg-green-50:hover { transform: scale(1.02); }
+.bg-purple-50:hover { transform: scale(1.02); }
+.bg-yellow-50:hover { transform: scale(1.02); }
+.bg-teal-50:hover { transform: scale(1.02); }
+.bg-indigo-50:hover { transform: scale(1.02); }
+
+/* Labels and Text */
+label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.text-indigo-700, .text-blue-800, .text-red-800, .text-green-800, .text-purple-800, .text-yellow-800, .text-teal-800, .text-indigo-800 {
+  color: var(--primary-dark);
+}
+
+.text-blue-600, .text-red-600, .text-green-600, .text-purple-600, .text-yellow-600, .text-teal-600, .text-indigo-600 {
+  color: var(--primary);
+}
+
+/* Payment Status */
+.bg-green-500 {
+  background: var(--secondary);
+}
+
+.bg-red-500 {
+  background: #EF4444;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  main {
+    padding: 1rem;
+  }
+
+  aside {
+    border-radius: 0.5rem;
+  }
+
+  .grid-cols-4, .grid-cols-5 {
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  }
+}

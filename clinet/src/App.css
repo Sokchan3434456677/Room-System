@@ -1,0 +1,104 @@
+.app {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  display: flex;
+  gap: 20px;
+}
+
+.form-section {
+  flex: 1;
+  max-width: 400px;
+}
+
+.list-section {
+  flex: 2;
+}
+
+.room-form {
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.save-btn {
+  background: #4CAF50;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.save-btn:hover {
+  background: #45a049;
+}
+
+.room-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.room-card {
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.room-card:hover {
+  transform: scale(1.05);
+}
+
+.room-card.paid {
+  background: #d4edda;
+  border-left: 5px solid #28a745;
+}
+
+.room-card.pending {
+  background: #fff3cd;
+  border-left: 5px solid #ffc107;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.summary-card {
+  padding: 15px;
+  border-radius: 8px;
+  background: #f8f9fa;
+}
+
+.summary-card.paid {
+  background: #d4edda;
+}
+
+.summary-card.pending {
+  background: #fff3cd;
+}
