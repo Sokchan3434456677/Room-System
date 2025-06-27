@@ -1,98 +1,3 @@
-// const express = require('express');
-// const mongoose = require('mongoose');
-// const cors = require('cors');
-// const app = express();
-
-// // Middleware
-// app.use(cors());
-// app.use(express.json());
-
-// // MongoDB Connection
-// mongoose.connect('mongodb+srv://sokchanear0:dKEhfzGaZ5F3ZNU2@cluster0.vrq9v2j.mongodb.net/testing?retryWrites=true&w=majority&appName=Cluster0', {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true
-// })
-// .then(() => console.log('Connected to MongoDB'))
-// .catch((err) => console.error('MongoDB connection error:', err));
-
-// // Room Schema
-// const roomSchema = new mongoose.Schema({
-//   roomId: { type: String, required: true, unique: true },
-//   date: { type: String },
-//   prevElectricityAmount: { type: Number, default: 0 },
-//   newElectricityAmount: { type: Number, default: 0 },
-//   usedElectricity: { type: Number, default: 0 },
-//   electricityCost: { type: Number, default: 0 },
-//   electricityRate: { type: Number, default: 0.25 },
-//   prevWaterAmount: { type: Number, default: 0 },
-//   newWaterAmount: { type: Number, default: 0 },
-//   usedWater: { type: Number, default: 0 },
-//   waterCost: { type: Number, default: 0 },
-//   waterRate: { type: Number, default: 0.005 },
-//   roomPrice: { type: Number, default: 300 },
-//   otherAmount: { type: Number, default: 0 },
-//   otherStatus: { type: String, default: 'Pending' },
-//   totalElectWater: { type: Number, default: 0 },
-//   totalRiel: { type: Number, default: 0 },
-//   lastUpdated: { type: String }
-// });
-
-// const Room = mongoose.model('Room', roomSchema);
-
-// // API Endpoints
-// // Get all rooms
-// app.get('/api/rooms', async (req, res) => {
-//   try {
-//     const rooms = await Room.find();
-//     const roomsData = rooms.reduce((acc, room) => {
-//       acc[room.roomId] = room;
-//       return acc;
-//     }, {});
-//     res.json(roomsData);
-//   } catch (err) {
-//     console.error('Error fetching rooms:', err);
-//     res.status(500).json({ error: 'Server error' });
-//   }
-// });
-
-// // Get specific room
-// app.get('/api/rooms/:roomId', async (req, res) => {
-//   try {
-//     const room = await Room.findOne({ roomId: req.params.roomId });
-//     if (!room) {
-//       return res.status(404).json({ error: 'Room not found' });
-//     }
-//     res.json(room);
-//   } catch (err) {
-//     console.error('Error fetching room:', err);
-//     res.status(500).json({ error: 'Server error' });
-//   }
-// });
-
-// // Save or update room data
-// app.post('/api/rooms/:roomId', async (req, res) => {
-//   try {
-//     const roomData = req.body;
-//     const room = await Room.findOneAndUpdate(
-//       { roomId: req.params.roomId },
-//       { $set: roomData },
-//       { new: true, upsert: true }
-//     );
-//     res.json(room);
-//   } catch (err) {
-//     console.error('Error saving room data:', err);
-//     res.status(500).json({ error: 'Server error' });
-//   }
-// });
-
-// // Start server
-// const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
-
-
-
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -259,6 +164,21 @@ app.put('/api/rooms-history/:id', async (req, res) => {
     res.json(updated);
   } catch (err) {
     console.error('Error updating room history:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Add DELETE endpoint to delete a room history record by _id
+app.delete('/api/rooms-history/:id', async (req, res) => {
+  try {
+    const RoomHistory = mongoose.models.RoomHistory || mongoose.model('RoomHistory', new mongoose.Schema({}, { strict: false, timestamps: true }));
+    const deleted = await RoomHistory.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ error: 'Room history not found' });
+    }
+    res.json({ message: 'Room history deleted' });
+  } catch (err) {
+    console.error('Error deleting room history:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });

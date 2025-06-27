@@ -213,14 +213,65 @@ label {
   }
 
   main {
-    padding: 1rem;
+    padding: 0.5rem;
   }
 
   aside {
-    border-radius: 0.5rem;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0.5rem;
+    min-width: 0;
+  }
+
+  aside h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  aside nav button {
+    padding: 0.5rem 0.5rem;
+    font-size: 0.95rem;
   }
 
   .grid-cols-4, .grid-cols-5 {
     grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  }
+
+  .bg-white, .bg-blue-50, .bg-red-50, .bg-green-50, .bg-purple-50, .bg-yellow-50, .bg-teal-50, .bg-indigo-50 {
+    padding: 1rem;
+    border-radius: 0.5rem;
+  }
+
+  .grid {
+    gap: 0.5rem;
+  }
+
+  .text-3xl, .text-4xl {
+    font-size: 1.5rem;
+  }
+
+  .text-2xl {
+    font-size: 1.2rem;
+  }
+
+  .text-xl {
+    font-size: 1rem;
+  }
+
+  .p-8 {
+    padding: 1rem !important;
+  }
+
+  .rounded-2xl {
+    border-radius: 0.75rem !important;
+  }
+}
+
+/* Add horizontal scroll for wide tables/lists on mobile */
+@media (max-width: 600px) {
+  ul.divide-y, .grid, .room-list, .summary-grid {
+    overflow-x: auto;
+    display: block;
+    white-space: nowrap;
   }
 }

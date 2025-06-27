@@ -93,45 +93,6 @@ const RoomDetailsForm = ({
     }
   };
 
-  const handleNewMonth = async () => {
-    if (!selectedRoomId) {
-      console.error("No room selected.");
-      return;
-    }
-
-    const currentRoomData = roomsData[selectedRoomId];
-
-    if (!currentRoomData) {
-      console.warn("No current room data to carry over for new month.");
-      return;
-    }
-
-    // Carry over new readings to previous, reset used/cost, other amount, and status
-    const newMonthData = {
-      prevElectricityAmount: parseFloat(currentRoomData.newElectricityAmount || 0),
-      newElectricityAmount: parseFloat(currentRoomData.newElectricityAmount || 0),
-      usedElectricity: 0,
-      electricityCost: 0,
-      prevWaterAmount: parseFloat(currentRoomData.newWaterAmount || 0),
-      newWaterAmount: parseFloat(currentRoomData.newWaterAmount || 0),
-      usedWater: 0,
-      waterCost: 0,
-      otherAmount: 0,
-      otherStatus: 'Pending',
-      date: new Date().toISOString().split('T')[0],
-      totalElectWater: parseFloat(currentRoomData.roomPrice || 0),
-      totalRiel: parseFloat(currentRoomData.roomPrice || 0),
-      lastUpdated: new Date().toISOString()
-    };
-
-    try {
-      await api.post(`/rooms/${selectedRoomId}`, newMonthData);
-      console.log(`Room ${selectedRoomId} data reset for new month successfully!`);
-    } catch (e) {
-      console.error("Error resetting room data for new month: ", e);
-    }
-  };
-
   return (
     <div className="bg-white p-8 rounded-2xl shadow-xl">
       {/* Popup Styled Alert */}
@@ -301,12 +262,6 @@ const RoomDetailsForm = ({
         >
           Save Room Data
         </button>
-        <button
-          onClick={handleNewMonth}
-          className="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 ease-in-out transform hover:scale-105"
-        >
-          New Month
-        </button>
       </div>
     </div>
   );
@@ -316,8 +271,12 @@ const RoomDetailsForm = ({
 const Dashboard = () => {
   const [historyData, setHistoryData] = useState([]);
   const [loading, setLoading] = useState(true);
-  // Add state for selected month
   const [selectedMonth, setSelectedMonth] = useState('');
+  // Add translation function and language from parent
+  const [language] = useState(
+    localStorage.getItem('room_language') || 'en'
+  );
+  const t = (key) => translations[language][key] || key;
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -377,7 +336,15 @@ const Dashboard = () => {
         </select>
       </div>
       {loading ? (
-        <p className="text-xl text-gray-700">Loading...</p>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+          <img
+            src={process.env.PUBLIC_URL + '/logo192.png'}
+            alt="App Logo"
+            className="w-24 h-24 mb-4 animate-bounce"
+            style={{ objectFit: 'contain' }}
+          />
+          <div className="text-xl text-gray-700">{t('loading')}</div>
+        </div>
       ) : totalRooms === 0 ? (
         <p className="text-xl text-gray-700">No rooms available. Please create a room to view dashboard statistics.</p>
       ) : (
@@ -526,6 +493,22 @@ const ListRooms = () => {
     setEditValues({});
   };
 
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this record?')) return;
+    try {
+      await api.delete(`/rooms-history/${id}`);
+      fetchRooms();
+    } catch (e) {
+      alert('Failed to delete room history');
+    }
+  };
+
+  // Add translation function and language from parent
+  const [language] = useState(
+    localStorage.getItem('room_language') || 'en'
+  );
+  const t = (key) => translations[language][key] || key;
+
   return (
     <div className="bg-white p-8 rounded-2xl shadow-xl">
       <h2 className="text-3xl font-semibold mb-6 text-indigo-600">Room List</h2>
@@ -564,7 +547,15 @@ const ListRooms = () => {
         </label>
       </div>
       {loading ? (
-        <p className="text-xl text-gray-700">Loading...</p>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+          <img
+            src={process.env.PUBLIC_URL + '/logo192.png'}
+            alt="App Logo"
+            className="w-24 h-24 mb-4 animate-bounce"
+            style={{ objectFit: 'contain' }}
+          />
+          <div className="text-xl text-gray-700">{t('loading')}</div>
+        </div>
       ) : filteredRooms.length === 0 ? (
         <p className="text-xl text-gray-700">No rooms available.</p>
       ) : viewAll ? (
@@ -749,12 +740,20 @@ const ListRooms = () => {
                             </button>
                           </>
                         ) : (
-                          <button
-                            onClick={() => handleEdit(room)}
-                            className="px-3 py-1 bg-blue-500 text-white rounded"
-                          >
-                            Edit
-                          </button>
+                          <>
+                            <button
+                              onClick={() => handleEdit(room)}
+                              className="px-3 py-1 bg-blue-500 text-white rounded"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(room._id)}
+                              className="px-3 py-1 bg-red-500 text-white rounded"
+                            >
+                              Delete
+                            </button>
+                          </>
                         )}
                       </div>
                     </li>
@@ -938,12 +937,20 @@ const ListRooms = () => {
                       </button>
                     </>
                   ) : (
-                    <button
-                      onClick={() => handleEdit(room)}
-                      className="px-3 py-1 bg-blue-500 text-white rounded"
-                    >
-                      Edit
-                    </button>
+                    <>
+                      <button
+                        onClick={() => handleEdit(room)}
+                        className="px-3 py-1 bg-blue-500 text-white rounded"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(room._id)}
+                        className="px-3 py-1 bg-red-500 text-white rounded"
+                      >
+                        Delete
+                      </button>
+                    </>
                   )}
                 </div>
               </li>
@@ -962,6 +969,7 @@ const RoomForm = () => {
   const [currentView, setCurrentView] = useState('rooms');
   const [isLoading, setIsLoading] = useState(true);
   const [language, setLanguage] = useState('en'); // Add language state
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Room form state
   const [date, setDate] = useState('');
@@ -1075,7 +1083,13 @@ const RoomForm = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <img
+          src={process.env.PUBLIC_URL + '/logo192.png'}
+          alt="App Logo"
+          className="w-24 h-24 mb-4 animate-bounce"
+          style={{ objectFit: 'contain' }}
+        />
         <div className="text-xl text-gray-700">{t('loading')}</div>
       </div>
     );
@@ -1083,11 +1097,51 @@ const RoomForm = () => {
 
   return (
     <ApiContext.Provider value={{ api }}>
-      <div className="flex min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 font-inter text-gray-800">
+      <div className="flex flex-col md:flex-row min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 font-inter text-gray-800">
+        {/* Topbar for mobile */}
+        <div className="md:hidden flex items-center justify-between bg-white px-4 py-2 shadow z-30">
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="text-2xl font-bold text-indigo-700 focus:outline-none"
+            aria-label="Open menu"
+          >
+            &#9776;
+          </button>
+          <span className="text-lg font-bold text-indigo-700">Sokchan DEV</span>
+          <div style={{ width: 32 }} /> {/* Spacer for symmetry */}
+        </div>
         {/* Sidebar for Room Selection and Navigation */}
-        <aside className="w-64 bg-white p-4 shadow-lg rounded-r-xl flex flex-col">
+        {/* Overlay for mobile menu */}
+        {mobileMenuOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-30 z-40 md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+        )}
+        <aside
+          className={`
+            fixed md:static z-50 md:z-20
+            top-0 left-0 h-full w-64 bg-white p-4 shadow-lg
+            rounded-none md:rounded-r-xl flex flex-col
+            transition-transform duration-200 ease-in-out
+            ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+            md:translate-x-0
+          `}
+          style={{ minHeight: 'auto' }}
+        >
+          {/* Close button for mobile */}
+          <div className="md:hidden flex justify-between items-center mb-2">
+            <span className="text-xl font-bold text-indigo-700">Sokchan DEV</span>
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-2xl font-bold text-indigo-700 focus:outline-none"
+              aria-label="Close menu"
+            >
+              &times;
+            </button>
+          </div>
           {/* Language toggle */}
-          <div className="flex justify-end mb-2">
+          <div className="flex justify-end mb-2 w-full">
             <button
               onClick={() => setLanguage(language === 'en' ? 'kh' : 'en')}
               className="px-3 py-1 rounded bg-indigo-100 text-indigo-700 font-bold text-sm"
@@ -1095,61 +1149,83 @@ const RoomForm = () => {
               {language === 'en' ? 'ភាសាខ្មែរ' : 'English'}
             </button>
           </div>
-          <h2 className="text-2xl font-bold mb-6 text-indigo-700">Sokchan DEV</h2>
-          <nav className="mb-8">
+          <h2 className="hidden md:block text-xl md:text-2xl font-bold mb-4 md:mb-6 text-indigo-700 w-full text-left">Sokchan DEV</h2>
+          <nav className="mb-4 md:mb-8 w-full flex flex-col gap-0">
             <button
-              onClick={() => setCurrentView('dashboard')}
+              onClick={() => { setCurrentView('dashboard'); setMobileMenuOpen(false); }}
               className={`w-full text-left p-3 rounded-lg font-medium mb-2 transition-all duration-200 ease-in-out
                           ${currentView === 'dashboard'
                   ? 'bg-indigo-600 text-white shadow-md transform scale-105'
                   : 'bg-gray-100 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700'
                 }`}
             >
+              {/* Dashboard Icon */}
+              <span className="inline-block align-middle mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M13 5v6h6m-6 0v6m0 0H7m6 0h6" />
+                </svg>
+              </span>
               {t('dashboard')}
             </button>
             <button
-              onClick={() => setCurrentView('rooms')}
+              onClick={() => { setCurrentView('rooms'); setMobileMenuOpen(false); }}
               className={`w-full text-left p-3 rounded-lg font-medium mb-2 transition-all duration-200 ease-in-out
                           ${currentView === 'rooms'
                   ? 'bg-indigo-600 text-white shadow-md transform scale-105'
                   : 'bg-gray-100 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700'
                 }`}
             >
+              {/* Room Details Icon */}
+              <span className="inline-block align-middle mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7V4a1 1 0 011-1h3m10 0a1 1 0 011 1v3m0 10v3a1 1 0 01-1 1h-3m-10 0a1 1 0 01-1-1v-3m16-8H4m16 0a2 2 0 00-2-2H6a2 2 0 00-2 2m16 0v10a2 2 0 01-2 2H6a2 2 0 01-2-2V7" />
+                </svg>
+              </span>
               {t('roomDetails')}
             </button>
-            {/* New List Rooms menu */}
             <button
-              onClick={() => setCurrentView('listRooms')}
+              onClick={() => { setCurrentView('listRooms'); setMobileMenuOpen(false); }}
               className={`w-full text-left p-3 rounded-lg font-medium transition-all duration-200 ease-in-out
                           ${currentView === 'listRooms'
                   ? 'bg-indigo-600 text-white shadow-md transform scale-105'
                   : 'bg-gray-100 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700'
                 }`}
             >
+              {/* List Rooms Icon */}
+              <span className="inline-block align-middle mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+              </span>
               {t('listRooms')}
             </button>
           </nav>
           {currentView === 'rooms' && (
-            <>
-              <h3 className="text-xl font-bold mb-4 text-indigo-700">{t('selectRoom')}</h3>
+            <div className="w-full">
+              <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-4 text-indigo-700">{t('selectRoom')}</h3>
               <button
                 onClick={handleCreateRoom}
-                className="w-full text-left p-3 rounded-lg font-medium bg-green-100 text-green-700 hover:bg-green-200 hover:text-green-800 transition-all duration-200 ease-in-out mb-4"
+                className="w-full text-left p-2 md:p-3 rounded-lg font-medium bg-green-100 text-green-700 hover:bg-green-200 hover:text-green-800 transition-all duration-200 ease-in-out mb-2 md:mb-4"
               >
+                {/* Create New Room Icon */}
+                <span className="inline-block align-middle mr-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </span>
                 {t('createNewRoom')}
               </button>
               {generateRoomNumbers().length === 0 ? (
                 <p className="text-sm text-gray-600">{t('noRooms')}</p>
               ) : (
                 <div
-                  className="grid grid-cols-3 gap-2 flex-grow pr-2"
-                  style={{ maxHeight: '350px', overflowY: 'auto' }}
+                  className="grid grid-cols-3 gap-2 flex-grow pr-2 max-h-32 md:max-h-[350px] overflow-y-auto"
                 >
                   {generateRoomNumbers().map((roomId) => (
                     <button
                       key={roomId}
-                      onClick={() => setSelectedRoomId(roomId)}
-                      className={`p-3 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out
+                      onClick={() => { setSelectedRoomId(roomId); setMobileMenuOpen(false); }}
+                      className={`p-2 md:p-3 rounded-lg text-xs md:text-sm font-medium transition-all duration-200 ease-in-out
                                   ${selectedRoomId === roomId
                           ? 'bg-indigo-600 text-white shadow-md transform scale-105'
                           : 'bg-gray-100 text-gray-700 hover:bg-indigo-100 hover:text-indigo-700'
@@ -1163,15 +1239,15 @@ const RoomForm = () => {
                   ))}
                 </div>
               )}
-            </>
+            </div>
           )}
-          <div className="mt-auto pt-4 border-t border-gray-200 text-sm text-gray-500">
+          <div className="mt-auto pt-2 md:pt-4 border-t border-gray-200 text-xs md:text-sm text-gray-500 w-full text-center md:text-left">
             <p>{t('devBy')}</p>
           </div>
         </aside>
         {/* Main Content Area */}
-        <main className="flex-1 p-8">
-          <h1 className="text-4xl font-extrabold mb-8 text-indigo-800">
+        <main className="flex-1 p-2 md:p-8 w-full max-w-full overflow-x-auto">
+          <h1 className="text-2xl md:text-4xl font-extrabold mb-4 md:mb-8 text-indigo-800">
             {t('roomManagement')}
           </h1>
           {currentView === 'rooms' ? (
@@ -1187,7 +1263,7 @@ const RoomForm = () => {
                 newWaterAmount={newWaterAmount} setNewWaterAmount={setNewWaterAmount}
                 waterRate={waterRate} setWaterRate={setWaterRate}
                 roomPrice={roomPrice} setRoomPrice={setRoomPrice}
-                otherAmount={otherAmount} setOtherAmount={setNewWaterAmount}
+                otherAmount={otherAmount} setOtherAmount={setOtherAmount}
                 otherStatus={otherStatus} setOtherStatus={setOtherStatus}
                 usedElectricity={usedElectricity} electricityCost={electricityCost}
                 usedWater={usedWater} waterCost={waterCost}
@@ -1196,7 +1272,7 @@ const RoomForm = () => {
                 roomsData={roomsData}
               />
             ) : (
-              <div className="text-xl text-gray-700">No rooms available. Please create a room to manage details.</div>
+              <div className="text-base md:text-xl text-gray-700">No rooms available. Please create a room to manage details.</div>
             )
           ) : currentView === 'dashboard' ? (
             <Dashboard />
