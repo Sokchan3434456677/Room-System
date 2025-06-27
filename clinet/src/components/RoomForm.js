@@ -281,7 +281,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/rooms-history');
+        const res = await axios.get('https://room-api-v1.vercel.app/api/rooms-history');
         setHistoryData(Array.isArray(res.data) ? res.data : Object.values(res.data));
       } catch (e) {
         setHistoryData([]);
@@ -412,7 +412,7 @@ const ListRooms = () => {
   const [viewAll, setViewAll] = useState(false); // <-- Add a toggle for "view info all"
   const [searchRoomId, setSearchRoomId] = useState(''); // <-- Add search state
   const api = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: 'https://room-api-v1.vercel.app/api',
     timeout: 10000
   });
 
@@ -993,7 +993,7 @@ const RoomForm = () => {
 
   // API client configuration
   const api = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: 'https://room-api-v1.vercel.app/api',
     timeout: 10000
   });
 
