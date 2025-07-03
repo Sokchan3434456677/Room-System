@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const app = express();
 
 // Middleware
@@ -14,6 +15,61 @@ mongoose.connect('mongodb+srv://sokchanear0:dKEhfzGaZ5F3ZNU2@cluster0.vrq9v2j.mo
 })
 .then(() => console.log('Connected to MongoDB'))
 .catch((err) => console.error('MongoDB connection error:', err));
+
+const JWT_SECRET = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzUxNTUwNjIyfQ.VVhG2JxUIYGmRrEROoDJCREIdLKT_bYkzEhpYjbiA4M'; // Change this to a strong secret
+
+// Dummy user for demonstration (replace with real user DB in production)
+const USER = { username: 'admin', password: 'chansok123' };
+
+// JWT Auth Middleware
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Hg merl Api And ng mean Token ot ah jmr (Free time Rean klas tv ah jmr kom der yk api ke use kdma jm' });
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Invalid token' });
+    req.user = user;
+    next();
+  });
+}
+
+// Login endpoint to get JWT token
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body;
+  if (username !== USER.username || password !== USER.password) {
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+  const token = jwt.sign({ username }, JWT_SECRET);
+  res.json({ token });
+});
+
+/*
+How to use JWT authentication:
+
+1. Obtain a token:
+   - Send a POST request to /api/login with JSON body:
+     {
+       "username": "admin",
+       "password": "password"
+     }
+   - The response will contain a "token" field.
+
+2. Use the token:
+   - For all other /api/* endpoints, include the token in the Authorization header:
+     Authorization: Bearer <your_token_here>
+
+   Example using curl:
+     curl -H "Authorization: Bearer <your_token_here>" http://localhost:5000/api/rooms
+
+   - If the token is missing or invalid, the API will return 401 or 403 errors.
+*/
+
+// Protect all API endpoints below (except /api/login)
+app.use('/api', (req, res, next) => {
+  if (req.path === '/login') return next();
+  authenticateToken(req, res, next);
+});
 
 // Room Schema
 const roomSchema = new mongoose.Schema({
